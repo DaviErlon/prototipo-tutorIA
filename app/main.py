@@ -1,0 +1,1 @@
+# inicializar todo mundo e rodar a API

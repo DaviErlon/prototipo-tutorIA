@@ -1,0 +1,1 @@
+# configuraçoes da aplicação / carregamentos das variaveis do .env
