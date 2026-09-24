@@ -1,1 +1,6 @@
-# configuraçoes da aplicação / carregamentos das variaveis do .env
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+OLLAMA_URL = os.getenv("OLLAMA_URL")

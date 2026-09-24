@@ -7,4 +7,4 @@ instalar as dependencias:
         
 
 executar com:
-    uvicorn main:app --reload
+    uvicorn app.main:app --reload
