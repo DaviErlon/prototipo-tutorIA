@@ -1,52 +1,56 @@
-from app.database.chroma import get_collection
+from app.databases.chroma import get_collection
+from app.schemas.models import Card
 
-def criar_card(card_id: str, titulo: str, conteudo: str):
+
+def criar_card(card: Card):
     collection = get_collection("cards")
 
     collection.add(
-        ids=[card_id],
-        documents=[conteudo],
+        ids=[card.id],
+        documents=[card.content],
         metadatas=[
             {
-                "titulo": titulo
+                "title": card.title
             }
         ]
     )
 
-def buscar_cards_semelhantes(texto: str, quantidade: int = 5):
+def buscar_cards_semelhantes(texto: str, limit: int = 5):
     collection = get_collection("cards")
 
     resultado = collection.query(
         query_texts=[texto],
-        n_results=quantidade
+        n_results=limit
     )
 
     cards = []
 
     for i in range(len(resultado["ids"][0])):
+
         cards.append({
             "id": resultado["ids"][0][i],
-            "titulo": resultado["metadatas"][0][i]["titulo"],
-            "conteudo": resultado["documents"][0][i],
-            "distancia": resultado["distances"][0][i]
+            "title": resultado["metadatas"][0][i]["title"],
+            "content": resultado["documents"][0][i],
+            "distance": resultado["distances"][0][i]
         })
 
     return cards
 
 
-def remover_card(card_id: str):
+def deletar_card(card_id: str):
     collection = get_collection("cards")
 
-    collection.delete(ids=[card_id])
+    collection.delete(
+        ids=[card_id]
+    )
 
-
-def listar_cards(pagina: int = 1, quantidade: int = 20):
+def listar_cards(page: int = 1, limit: int = 15):
     collection = get_collection("cards")
 
-    inicio = (pagina - 1) * quantidade
+    inicio = (page - 1) * limit
 
     resultado = collection.get(
-        limit=quantidade,
+        limit=limit,
         offset=inicio,
         include=["documents", "metadatas"]
     )
@@ -58,16 +62,16 @@ def listar_cards(pagina: int = 1, quantidade: int = 20):
     for i in range(len(resultado["ids"])):
         cards.append({
             "id": resultado["ids"][i],
-            "titulo": resultado["metadatas"][i]["titulo"],
-            "conteudo": resultado["documents"][i]
+            "title": resultado["metadatas"][i]["title"],
+            "content": resultado["documents"][i]
         })
 
     return {
         "data": cards,
         "pagination": {
-            "page": pagina,
-            "limit": quantidade,
+            "page": page,
+            "limit": limit,
             "total": total,
-            "has_next": inicio + quantidade < total
+            "has_next": inicio + limit < total
         }
     }

@@ -1,5 +1,5 @@
 import chromadb
-from app.database.embeddings import OllamaEmbeddingFunction
+from app.databases.embeddings import OllamaEmbeddingFunction
 
 client = chromadb.PersistentClient(path="./chroma_data")
 

@@ -1,3 +1,6 @@
 .env
 __pycache__/
 *.pyc
+
+chat.db
+chroma_data/
