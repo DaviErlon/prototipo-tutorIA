@@ -1,0 +1,422 @@
+:root {
+    --bg: #141414;
+    --bg-elevated: #1b1b1b;
+    --bg-sidebar: #191919;
+    --border: #2a2a2a;
+    --text: #e7e5e0;
+    --text-dim: #8f8c86;
+    --accent: #c98f4d;
+    --accent-dim: #8a622f;
+    --bubble-user: #242424;
+    --bubble-assistant: #1c1c1c;
+    --danger: #c96b4d;
+    --radius: 10px;
+    --font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+body {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 12px;
+}
+
+.sidebar-brand {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    color: var(--text-dim);
+    letter-spacing: .02em;
+    padding: 0 18px 16px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-brand strong {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+.new-chat-btn:hover {
+    border-color: var(--accent-dim);
+    background: rgba(201, 143, 77, .08);
+}
+
+.new-chat-btn svg {
+    flex-shrink: 0;
+}
+
+.chat-history {
+    margin-top: 18px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.history-item {
+    padding: 9px 10px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background .15s ease, color .15s ease;
+}
+
+.history-item:hover {
+    background: var(--bg-elevated);
+    color: var(--text);
+}
+
+.history-item.active {
+    background: var(--bg-elevated);
+    color: var(--text);
+    border-left: 2px solid var(--accent);
+    padding-left: 8px;
+}
+
+.delete-chat-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    float: right;
+    font-size: 16px;
+    line-height: 1;
+    opacity: .6;
+}
+
+/* ---------- CHAT ---------- */
+
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+}
+
+.chat-header {
+    height: 52px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 0 20px;
+}
+
+.messages-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 82%;
+}
+
+.message.tutor {
+    align-self: flex-start;
+}
+
+.message.user {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.message .role {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: lowercase;
+}
+
+.message .bubble {
+    padding: 11px 14px;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    line-height: 1.55;
+}
+
+.message.tutor .bubble {
+    background: var(--bubble-assistant);
+    border: 1px solid var(--border);
+    border-top-left-radius: 3px;
+}
+
+.message.user .bubble {
+    background: var(--bubble-user);
+    border-top-right-radius: 3px;
+}
+
+/* ---------- PROMPT AREA ---------- */
+
+.prompt_area {
+    flex-shrink: 0;
+    padding: 14px 24px calc(18px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+}
+
+.prompt_inner {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 9px 9px 9px 16px;
+    transition: border-color .15s ease;
+}
+
+.prompt_inner:focus-within {
+    border-color: var(--accent-dim);
+}
+
+.text {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14.5px;
+    line-height: 1.5;
+    max-height: 160px;
+    padding: 6px 0;
+}
+
+.text::placeholder {
+    color: var(--text-dim);
+}
+
+#send_btn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #1a1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .15s ease, transform .1s ease;
+}
+
+#send_btn:hover {
+    background: #dba05c;
+}
+
+#send_btn:active {
+    transform: scale(.94);
+}
+
+#send_btn:disabled {
+    background: var(--bg-sidebar);
+    color: var(--text-dim);
+    cursor: default;
+}
+
+.hint {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 8px;
+}
+
+/* ---------- SCROLLBAR ---------- */
+
+.messages::-webkit-scrollbar,
+.chat-history::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages::-webkit-scrollbar-thumb,
+.chat-history::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 8px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 720px) {
+    .sidebar {
+        position: fixed;
+        z-index: 10;
+        height: 100%;
+        transform: translateX(-100%);
+        transition: transform .2s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .message {
+        max-width: 92%;
+    }
+}
+
+/* Mensagens do usuário: preserva quebras de linha digitadas */
+.message.user .bubble {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Mensagens do tutor: o Markdown já gera os parágrafos */
+.bubble.markdown {
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.65;
+}
+
+.bubble.markdown > *:first-child { margin-top: 0; }
+.bubble.markdown > *:last-child  { margin-bottom: 0; }
+
+.bubble.markdown p { margin: 0 0 0.8em; }
+
+.bubble.markdown strong { font-weight: 600; color: #fff; }
+
+.bubble.markdown h1,
+.bubble.markdown h2,
+.bubble.markdown h3,
+.bubble.markdown h4 {
+    margin: 1.2em 0 0.5em;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.bubble.markdown h1 { font-size: 1.25em; }
+.bubble.markdown h2 { font-size: 1.15em; }
+.bubble.markdown h3,
+.bubble.markdown h4 { font-size: 1.05em; }
+
+.bubble.markdown ul,
+.bubble.markdown ol {
+    margin: 0 0 0.8em;
+    padding-left: 1.4em;
+}
+.bubble.markdown li { margin: 0.25em 0; }
+
+.bubble.markdown a {
+    color: #e0a030;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.bubble.markdown blockquote {
+    margin: 0 0 0.8em;
+    padding: 0.2em 0 0.2em 0.9em;
+    border-left: 3px solid #e0a030;
+    opacity: 0.85;
+}
+
+.bubble.markdown hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin: 1em 0;
+}
+
+/* Código inline */
+.bubble.markdown code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88em;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+}
+
+/* Blocos de código */
+.bubble.markdown pre {
+    margin: 0 0 0.8em;
+    padding: 12px 14px;
+    background: #0d0d0d;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.bubble.markdown pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.85em;
+    line-height: 1.55;
+}
+
+/* Tabelas */
+.bubble.markdown table {
+    border-collapse: collapse;
+    margin: 0 0 0.8em;
+    display: block;
+    overflow-x: auto;
+}
+.bubble.markdown th,
+.bubble.markdown td {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 10px;
+    text-align: left;
+}
+.bubble.markdown th { background: rgba(255, 255, 255, 0.05); }

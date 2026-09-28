@@ -1,11 +1,57 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tutor IA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-    <h1>Oiii</h1>
+
+    <div class="sidebar">
+        <div class="sidebar-brand"><strong>Tutor</strong>IA</div>
+
+        <button class="new-chat-btn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+            </svg>
+            Nova conversa
+        </button>
+
+        <div class="chat-history"></div>
+    </div>
+
+    <div class="chat">
+        <div class="chat-header"></div>
+
+        <div class="messages">
+            <div class="messages-inner"></div>
+        </div>
+
+        <div class="prompt_area">
+            <div class="prompt_inner">
+                <textarea class="text" rows="1" placeholder="Envie uma mensagem..."></textarea>
+                <button id="send_btn" disabled>
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <path d="M7.5 12.5V2.5M7.5 2.5L3 7M7.5 2.5L12 7" stroke="currentColor" stroke-width="1.6"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="hint" style="padding-bottom:10px">Enter envia · Shift+Enter quebra linha</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <script src="js/script.js"></script>
 </body>
+
 </html>

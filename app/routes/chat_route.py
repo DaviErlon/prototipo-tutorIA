@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.schemas.models import Prompt
+from app.services.ollama_service import send_to_llm
 from app.services.chat_service import (
     criar_chat,
     criar_mensagem,
@@ -36,8 +37,17 @@ def promt_route(id: int, prompt: Prompt):
         role="user"
     )
 
+    res = send_to_llm(prompt.content)
+    
+    mensagem_id = criar_mensagem(
+        chat_id=id,
+        content=res,
+        role="assistant"
+    )
+
     return {
-        "id": mensagem_id
+        "id": mensagem_id,
+        "content": res
     }
 
 
