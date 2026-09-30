@@ -11,10 +11,14 @@ cards_router = APIRouter(
     prefix="/api/cards"
 )
 
+# pesquisa inteligente de cards
+# criar cards
+# deletar cards
+
 @cards_router.get("/")
 def listar_cards_route(key: str | None = None, page: int = 1, limit: int = 15):
     if key is not None:
-        return buscar_cards_semelhantes(key)
+        return buscar_cards_semelhantes(key, limit)
     else:
         return listar_cards(page, limit)
     

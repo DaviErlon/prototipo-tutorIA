@@ -14,6 +14,12 @@ chat_router = APIRouter(
     prefix="/api/chat"
 )
 
+# criar chat
+# mandar mensagem para um chat
+# listar chats
+# buscar mensagens de um chat especifico
+# deletar chat
+
 @chat_router.post("/")
 def criar_chat_route():
     chat_id = criar_chat()

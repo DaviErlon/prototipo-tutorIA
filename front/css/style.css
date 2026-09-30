@@ -47,6 +47,8 @@ body {
     display: flex;
     flex-direction: column;
     padding: 16px 12px;
+
+    overflow: hidden;
 }
 
 .sidebar-brand {
@@ -147,9 +149,40 @@ body {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 20px;
     border-bottom: 1px solid var(--border);
+}
+
+.header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 14px;
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e8e8e8;
+
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.header-btn:hover {
+    background: rgba(224, 160, 48, 0.12);
+    border-color: rgba(224, 160, 48, 0.4);
+    color: #e0a030;
+}
+
+.header-btn svg {
+    flex-shrink: 0;
 }
 
 .messages {
@@ -206,6 +239,23 @@ body {
 .message.user .bubble {
     background: var(--bubble-user);
     border-top-right-radius: 3px;
+}
+
+/* ---------- CARDS AREA ---------- */
+
+.cards {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 0 20px;
+}
+
+.cards-grid {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
 }
 
 /* ---------- PROMPT AREA ---------- */
@@ -335,12 +385,22 @@ body {
     line-height: 1.65;
 }
 
-.bubble.markdown > *:first-child { margin-top: 0; }
-.bubble.markdown > *:last-child  { margin-bottom: 0; }
+.bubble.markdown>*:first-child {
+    margin-top: 0;
+}
 
-.bubble.markdown p { margin: 0 0 0.8em; }
+.bubble.markdown>*:last-child {
+    margin-bottom: 0;
+}
 
-.bubble.markdown strong { font-weight: 600; color: #fff; }
+.bubble.markdown p {
+    margin: 0 0 0.8em;
+}
+
+.bubble.markdown strong {
+    font-weight: 600;
+    color: #fff;
+}
 
 .bubble.markdown h1,
 .bubble.markdown h2,
@@ -350,17 +410,29 @@ body {
     font-weight: 600;
     line-height: 1.3;
 }
-.bubble.markdown h1 { font-size: 1.25em; }
-.bubble.markdown h2 { font-size: 1.15em; }
+
+.bubble.markdown h1 {
+    font-size: 1.25em;
+}
+
+.bubble.markdown h2 {
+    font-size: 1.15em;
+}
+
 .bubble.markdown h3,
-.bubble.markdown h4 { font-size: 1.05em; }
+.bubble.markdown h4 {
+    font-size: 1.05em;
+}
 
 .bubble.markdown ul,
 .bubble.markdown ol {
     margin: 0 0 0.8em;
     padding-left: 1.4em;
 }
-.bubble.markdown li { margin: 0.25em 0; }
+
+.bubble.markdown li {
+    margin: 0.25em 0;
+}
 
 .bubble.markdown a {
     color: #e0a030;
@@ -399,6 +471,7 @@ body {
     border-radius: 8px;
     overflow-x: auto;
 }
+
 .bubble.markdown pre code {
     background: none;
     padding: 0;
@@ -413,10 +486,18 @@ body {
     display: block;
     overflow-x: auto;
 }
+
 .bubble.markdown th,
 .bubble.markdown td {
     border: 1px solid rgba(255, 255, 255, 0.12);
     padding: 6px 10px;
     text-align: left;
 }
-.bubble.markdown th { background: rgba(255, 255, 255, 0.05); }
+
+.bubble.markdown th {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.hidden {
+    display: none;
+}
