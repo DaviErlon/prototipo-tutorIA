@@ -1,5 +1,5 @@
 const CHAT_PATH = '/api/chat';
-const CARDS_PATH = '/api/chat';
+const CARDS_PATH = '/api/cards';
 
 async function solicitar(url, options) {
     const response = await fetch(url, options);
@@ -41,7 +41,7 @@ export async function apiEnviarPrompt(id, content) {
 export async function apiGetCards(value, limit) {
     let url = `${CARDS_PATH}/?limit=${limit}`;
 
-    if (value && value !== "") {
+    if (value && value.trim() !== '') {
         url += `&key=${value}`;
     }
     const response = await solicitar(url);

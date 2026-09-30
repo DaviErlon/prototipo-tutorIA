@@ -35,9 +35,9 @@ export function criarChatController(view, textarea, sendBtn) {
 
     async function novoChat() {
         try {
-            const id = await apiCriarChat();
+            const res = await apiCriarChat();
             await carregarChats();
-            await abrirChat(id);
+            await abrirChat(res.id);
         } catch (error) {
             console.error(error);
         }
@@ -52,7 +52,7 @@ export function criarChatController(view, textarea, sendBtn) {
                 chatAtualId = null;
                 if (chats.length > 0) {
                     const maisRecente = Math.max(...chats.map((chat) => chat.id));
-                    await abrirChat(maisRecente);
+                    await abrirChat(maisRecente.id);
                 } else {
                     view.renderizarEstadoVazio();
                 }

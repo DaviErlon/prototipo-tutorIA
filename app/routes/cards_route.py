@@ -22,7 +22,6 @@ def listar_cards_route(key: str | None = None, page: int = 1, limit: int = 15):
     else:
         return listar_cards(page, limit)
     
-
 @cards_router.post("/")
 def criar_card_route(card: Card):
     criar_card(card)

@@ -71,12 +71,23 @@ export function criarChatView({
     }
 
     function renderizarEstadoVazio() {
-        messagesInner.innerHTML = `
-        <div class="message tutor">
-        <span class="role">tutor</span>
-        <div class="bubble">Olá! Crie uma nova conversa ou selecione uma existente para começar.</div>
-        </div>
-        `;
+        messagesInner.innerHTML = '';
+
+        const el = document.createElement('div');
+        el.className = 'message tutor';
+
+        const role = document.createElement('span');
+        role.className = 'role';
+        role.textContent = 'tutor';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+
+        bubble.textContent = 'Olá! Crie uma nova conversa ou selecione uma existente para começar.';
+
+        el.append(role, bubble);
+
+        messagesInner.appendChild(el);
     }
 
     function renderizarListaChats(chats, chatAtualId, abrirChat, deletarChat) {
@@ -93,7 +104,7 @@ export function criarChatView({
             titulo.textContent = `Chat: ${chat.id}`;
 
             const btnDeletar = document.createElement('button');
-            btnDeletar.className = 'delete-chat-btn';
+            btnDeletar.className = 'delete-btn';
             btnDeletar.title = 'Deletar conversa';
             btnDeletar.innerHTML = '&times;';
             btnDeletar.addEventListener('click', (event) => {

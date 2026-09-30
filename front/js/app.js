@@ -1,5 +1,7 @@
 import { criarChatController } from './chat-controller.js';
 import { criarChatView } from './chat-view.js';
+import { criarCardsController } from './cards-controller.js';
+import { criarCardsView } from './cards-view.js';
 
 function selecionarSeletor(seletor) {
     const elemento = document.querySelector(seletor);
@@ -21,6 +23,7 @@ export function inicializarApp() {
     const messagesInner = selecionarSeletor('.messages-inner');
     const messagesBox = selecionarSeletor('.messages');
     const cardsBox = selecionarSeletor('.cards');
+    const cardsGride = selecionarSeletor('.cards-grid');
     const chatHistory = selecionarSeletor('.chat-history');
 
     let modoCards = false;
@@ -34,6 +37,9 @@ export function inicializarApp() {
         messagesBox
     });
     const chat_controller = criarChatController(chat_view, textarea, sendBtn);
+
+    const card_view = criarCardsView(cardsGride);
+    const card_controller = criarCardsController(card_view);
 
     textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
@@ -58,8 +64,10 @@ export function inicializarApp() {
         modoCards = !modoCards;
         if(modoCards){
             textarea.placeholder = 'Pesquise por um card...';
+
         } else {
             textarea.placeholder = 'Envie uma mensagem...';
+
         }
 
         sendBtn.classList.toggle('hidden');
@@ -73,4 +81,6 @@ export function inicializarApp() {
     newChatBtn.addEventListener('click', chat_controller.novoChat);
 
     chat_controller.inicializar();
+    card_controller.inicializar();
+    
 }
