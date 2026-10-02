@@ -1,10 +1,10 @@
 import {
-    apiGetCards,
+    apiBuscarCards,
     apiCriarCard,
     apiDeletarCard,
 } from './api.js';
 
-export function criarCardsController({ cardsView }) {
+export function criarCardsController({ cardsView, textarea }) {
 
     function pegarPagina() {
         const page = localStorage.getItem('tutor-ia-page');
@@ -15,12 +15,30 @@ export function criarCardsController({ cardsView }) {
         return Number(page);
     }
 
+    async function buscarCards() {
+        const mensagem = textarea.value.trim();
+        if (mensagem.length === 0) return;
+
+        try {
+            const cards = await apiBuscarCards(mensagem, 1, 6);
+            cardsView.renderizarCards(
+                cards,
+                deletarCard,
+                cards.pagination,
+                prevCards,
+                proxCards
+            );
+            return cards;
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    }
 
     async function carregarCards() {
         try {
             const page = pegarPagina();
-
-            const cards = await apiGetCards('', page, 6);
+            const cards = await apiBuscarCards('', page, 6);
 
             // voltar a pagina
             if (cards.data.length === 0 && page > 1) {
@@ -90,6 +108,7 @@ export function criarCardsController({ cardsView }) {
         carregarCards,
         novoCard,
         deletarCard,
-        inicializar
+        inicializar,
+        buscarCards
     };
 }

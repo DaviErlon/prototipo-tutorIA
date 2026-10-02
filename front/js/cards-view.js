@@ -192,7 +192,7 @@ export function criarCardsView({
     ) {
         cardsGrid.innerHTML = '';
 
-        if (!cards || cards.length === 0) {
+        if ((!cards || cards.length === 0 ) && pagination) {
             renderizarEstadoVazio();
             renderizarSetas(pagination, prevCards, proxCards);
             return;

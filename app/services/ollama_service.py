@@ -1,7 +1,7 @@
 import requests
 import json
 
-from app.config.settings import OLLAMA_URL, MODEL
+from app.config.settings import OLLAMA_URL, MODEL, TEMPERATURE
 from app.services.cards_service import buscar_cards_semelhantes
 from app.services.chat_service import listar_mensagens, criar_mensagem
 
@@ -68,7 +68,10 @@ def send_to_llm(content: str, chat_id: int):
         json={
             "model": MODEL,
             "messages": generate_default_prompt(content, chat_id),
-            "stream": False
+            "stream": False,
+            "options": {
+                "temperature": TEMPERATURE
+            }
         }
     )
 
@@ -85,7 +88,10 @@ def send_to_llm_stream(content: str, chat_id: int):
         json={
             "model": MODEL,
             "messages": generate_default_prompt(content, chat_id),
-            "stream": True
+            "stream": True,
+            "options": {
+                "temperature": TEMPERATURE
+            }
         },
         stream=True,
         timeout=(5, 120)

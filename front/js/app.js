@@ -38,43 +38,65 @@ export function inicializarApp() {
         messagesBox
     });
     const chatController = criarChatController({
-        chatView, 
-        textarea, 
+        chatView,
+        textarea,
         sendBtn
     });
 
     const cardsView = criarCardsView({
-        cardsGrid, 
+        cardsGrid,
         cardsBox
     });
     const cardsController = criarCardsController({
-        cardsView
+        cardsView,
+        textarea
     });
+
+    let timerPesquisa;
 
     textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
         textarea.style.height = `${textarea.scrollHeight}px`;
+
         sendBtn.disabled = textarea.value.trim().length === 0;
+
+        if (!modoCards) return;
+
+        clearTimeout(timerPesquisa);
+
+        if (textarea.value.trim() === '') {
+            cardsController.carregarCards();
+            return;
+        }
+
+        timerPesquisa = setTimeout(() => {
+            cardsController.buscarCards();
+        }, 1000);
     });
 
-    // se modoCards entao pesquisar dps de 1 segundos sem o user digitar
     textarea.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            if (!sendBtn.disabled) sendBtn.click();
+
+            if (!sendBtn.disabled) {
+                sendBtn.click();
+            }
         }
     });
 
-    // se modo Cards entao cards_chat_controller.pesquisarCards()
-    sendBtn.addEventListener('click', chatController.enviarPrompt);
-
-    newCardBtn.addEventListener('click', cardsController.novoCard);
+    sendBtn.addEventListener('click', () => {
+        if (modoCards) {
+            cardsController.buscarCards();
+        } else {
+            chatController.enviarPrompt();
+        }
+    });
 
     cardsBtn.addEventListener('click', () => {
         chatView.limparTextarea();
-        
+
         modoCards = !modoCards;
-        if(modoCards){
+        if (modoCards) {
             textarea.placeholder = 'Pesquise por um card...';
         } else {
             textarea.placeholder = 'Envie uma mensagem...';
@@ -88,7 +110,6 @@ export function inicializarApp() {
         newCardBtn.classList.toggle('hidden')
     });
 
-    newChatBtn.addEventListener('click', chatController.novoChat);
 
     chatController.inicializar();
     cardsController.inicializar();

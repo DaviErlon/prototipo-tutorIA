@@ -1,7 +1,6 @@
 import {
     apiCriarChat,
     apiDeletarChat,
-    apiEnviarPrompt,
     apiEnviarPromptStream,
     apiListarChats,
     apiListarMensagens

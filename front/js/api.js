@@ -75,7 +75,7 @@ export async function apiEnviarPromptStream(chatId, content, onChunk, signal) {
     return textoCompleto;
 }
 
-export async function apiGetCards(value, page, limit) {
+export async function apiBuscarCards(value, page, limit) {
     let url = `${CARDS_PATH}/?page=${page}&limit=${limit}`;
 
     if (value && value.trim() !== '') {
