@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
 from app.schemas.models import Prompt
-from app.services.ollama_service import send_to_llm, send_to_llm_stream
+from app.services.ollama_service import send_to_llm, stream_and_save
 from app.services.chat_service import (
     criar_chat,
     criar_mensagem,
@@ -54,7 +54,7 @@ def promt_route(id: int, prompt: Prompt):
 @chat_router.post("/chats/{chat_id}/stream")
 def prompt_stream(chat_id: int, prompt: Prompt):
     return StreamingResponse(
-        send_to_llm_stream(prompt.content, chat_id),
+        stream_and_save(prompt.content, chat_id),
         media_type="text/plain; charset=utf-8"
     )
 
