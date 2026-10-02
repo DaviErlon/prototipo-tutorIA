@@ -43,7 +43,7 @@ def promt_route(id: int, prompt: Prompt):
         role="user"
     )
 
-    res = send_to_llm(prompt.content)
+    res = send_to_llm(prompt.content, id)
     
     mensagem_id = criar_mensagem(
         chat_id=id,

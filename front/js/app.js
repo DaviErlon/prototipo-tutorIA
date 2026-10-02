@@ -92,5 +92,4 @@ export function inicializarApp() {
 
     chatController.inicializar();
     cardsController.inicializar();
-    cardsBtn.click();
 }
