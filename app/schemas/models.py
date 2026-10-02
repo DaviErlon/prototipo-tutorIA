@@ -4,7 +4,6 @@ class Prompt(BaseModel):
     content: str
 
 class Card(BaseModel):
-    id: str
     title: str
     content: str
 

@@ -6,14 +6,18 @@ import {
     apiListarMensagens
 } from './api.js';
 
-export function criarChatController(view, textarea, sendBtn) {
+export function criarChatController({
+    chatView,
+    textarea,
+    sendBtn
+}) {
     let chatAtualId = null;
     let enviando = false;
 
     async function carregarChats() {
         try {
             const chats = await apiListarChats();
-            view.renderizarListaChats(chats, chatAtualId, abrirChat, deletarChat);
+            chatView.renderizarListaChats(chats, chatAtualId, abrirChat, deletarChat);
             return chats;
         } catch (error) {
             console.error(error);
@@ -25,8 +29,8 @@ export function criarChatController(view, textarea, sendBtn) {
         try {
             chatAtualId = id;
             const mensagens = await apiListarMensagens(id);
-            view.renderizarMensagens(mensagens);
-            view.definirChatAtivo(id);
+            chatView.renderizarMensagens(mensagens);
+            chatView.definirChatAtivo(id);
             textarea.focus();
         } catch (error) {
             console.error(error);
@@ -54,7 +58,7 @@ export function criarChatController(view, textarea, sendBtn) {
                     const maisRecente = Math.max(...chats.map((chat) => chat.id));
                     await abrirChat(maisRecente.id);
                 } else {
-                    view.renderizarEstadoVazio();
+                    chatView.renderizarEstadoVazio();
                 }
             }
         } catch (error) {
@@ -74,33 +78,33 @@ export function criarChatController(view, textarea, sendBtn) {
         try {
             if (chatAtualId === null) {
                 chatAtualId = await apiCriarChat();
-                view.limparMensagens();
+                chatView.limparMensagens();
                 await carregarChats();
             }
 
             const idDoChat = chatAtualId;
-            view.renderizarMensagem({ role: 'user', content: mensagem });
-            view.limparTextarea();
-            view.rolarParaOFim();
-            view.mostrarDigitando();
+            chatView.renderizarMensagem({ role: 'user', content: mensagem });
+            chatView.limparTextarea();
+            chatView.rolarParaOFim();
+            chatView.mostrarDigitando();
 
             try {
                 const data = await apiEnviarPrompt(idDoChat, mensagem);
                 if (chatAtualId === idDoChat) {
-                    view.removerDigitando();
-                    view.renderizarMensagem({ role: 'tutor', content: data.content });
-                    view.rolarParaOFim();
+                    chatView.removerDigitando();
+                    chatView.renderizarMensagem({ role: 'tutor', content: data.content });
+                    chatView.rolarParaOFim();
                 }
             } catch (error) {
                 console.error(error);
                 if (chatAtualId === idDoChat) {
-                    view.removerDigitando();
-                    view.mostrarErro('Não foi possível obter a resposta. Tente novamente.');
+                    chatView.removerDigitando();
+                    chatView.mostrarErro('Não foi possível obter a resposta. Tente novamente.');
                 }
             }
         } catch (error) {
             console.error(error);
-            view.mostrarErro('Não foi possível criar a conversa.');
+            chatView.mostrarErro('Não foi possível criar a conversa.');
         } finally {
             enviando = false;
             sendBtn.disabled = textarea.value.trim().length === 0;
@@ -114,7 +118,7 @@ export function criarChatController(view, textarea, sendBtn) {
             const maisRecente = Math.max(...chats.map((chat) => chat.id));
             await abrirChat(maisRecente);
         } else {
-            view.renderizarEstadoVazio();
+            chatView.renderizarEstadoVazio();
         }
     }
 

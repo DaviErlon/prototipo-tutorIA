@@ -38,8 +38,8 @@ export async function apiEnviarPrompt(id, content) {
     return response.json();
 }
 
-export async function apiGetCards(value, limit) {
-    let url = `${CARDS_PATH}/?limit=${limit}`;
+export async function apiGetCards(value, page, limit) {
+    let url = `${CARDS_PATH}/?page=${page}&limit=${limit}`;
 
     if (value && value.trim() !== '') {
         url += `&key=${value}`;
@@ -48,11 +48,11 @@ export async function apiGetCards(value, limit) {
     return response.json();
 }
 
-export async function apiCriarCard(card) {
+export async function apiCriarCard(title, content) {
     const response = await solicitar(`${CARDS_PATH}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ card })
+        body: JSON.stringify({title, content})
     });
     return response.json();
 }

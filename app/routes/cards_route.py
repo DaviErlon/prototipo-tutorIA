@@ -16,7 +16,7 @@ cards_router = APIRouter(
 # deletar cards
 
 @cards_router.get("/")
-def listar_cards_route(key: str | None = None, page: int = 1, limit: int = 15):
+def listar_cards_route(key: str | None = None, page: int = 1, limit: int = 6):
     if key is not None:
         return buscar_cards_semelhantes(key, limit)
     else:
@@ -24,9 +24,9 @@ def listar_cards_route(key: str | None = None, page: int = 1, limit: int = 15):
     
 @cards_router.post("/")
 def criar_card_route(card: Card):
-    criar_card(card)
+    return criar_card(card)
 
 
 @cards_router.delete("/{id}")
 def deletar_card_route(id: str):
-    deletar_card(id)
+    return deletar_card(id)

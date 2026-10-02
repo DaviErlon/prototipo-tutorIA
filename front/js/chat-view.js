@@ -82,40 +82,40 @@ export function criarChatView({
 
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-
         bubble.textContent = 'Olá! Crie uma nova conversa ou selecione uma existente para começar.';
 
         el.append(role, bubble);
-
         messagesInner.appendChild(el);
+    }
+
+    function renderizarItemChat(chat, chatAtualId, abrirChat, deletarChat) {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.dataset.id = chat.id;
+        if (chat.id === chatAtualId) item.classList.add('active');
+
+        const titulo = document.createElement('span');
+        titulo.textContent = `Chat: ${chat.id}`;
+
+        const btnDeletar = document.createElement('button');
+        btnDeletar.className = 'delete-btn';
+        btnDeletar.title = 'Deletar conversa';
+        btnDeletar.innerHTML = '&times;';
+        btnDeletar.addEventListener('click', (event) => {
+            event.stopPropagation();
+            deletarChat(chat.id);
+        });
+
+        item.append(titulo, btnDeletar);
+        item.addEventListener('click', () => abrirChat(chat.id));
+        chatHistory.appendChild(item);
     }
 
     function renderizarListaChats(chats, chatAtualId, abrirChat, deletarChat) {
         chatHistory.innerHTML = '';
         const ordenados = [...chats].sort((a, b) => b.id - a.id);
 
-        ordenados.forEach((chat) => {
-            const item = document.createElement('div');
-            item.className = 'history-item';
-            item.dataset.id = chat.id;
-            if (chat.id === chatAtualId) item.classList.add('active');
-
-            const titulo = document.createElement('span');
-            titulo.textContent = `Chat: ${chat.id}`;
-
-            const btnDeletar = document.createElement('button');
-            btnDeletar.className = 'delete-btn';
-            btnDeletar.title = 'Deletar conversa';
-            btnDeletar.innerHTML = '&times;';
-            btnDeletar.addEventListener('click', (event) => {
-                event.stopPropagation();
-                deletarChat(chat.id);
-            });
-
-            item.append(titulo, btnDeletar);
-            item.addEventListener('click', () => abrirChat(chat.id));
-            chatHistory.appendChild(item);
-        });
+        ordenados.forEach((chat) => { renderizarItemChat(chat, chatAtualId, abrirChat, deletarChat) });
     }
 
     function definirChatAtivo(id) {

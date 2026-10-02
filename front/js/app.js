@@ -13,22 +13,23 @@ function selecionarSeletor(seletor) {
 
 export function inicializarApp() {
     const textarea = selecionarSeletor('.text');
-    const sendBtn = selecionarSeletor('#send_btn');
+    const sendBtn = selecionarSeletor('#send-btn');
+    const newCardBtn = selecionarSeletor('#new-card-btn');
     const lupaIcon = selecionarSeletor('.lupa');
     const setaIcon = selecionarSeletor('.seta');
     const sideBar = selecionarSeletor('.sidebar');
-    const newChatBtn = selecionarSeletor('.new-chat-btn');
+    const newChatBtn = selecionarSeletor('#new-chat-btn');
     const chatHeader = selecionarSeletor('.chat-header');
-    const cardsBtn = selecionarSeletor('.header-btn');
+    const cardsBtn = selecionarSeletor('#header-btn');
     const messagesInner = selecionarSeletor('.messages-inner');
     const messagesBox = selecionarSeletor('.messages');
     const cardsBox = selecionarSeletor('.cards');
-    const cardsGride = selecionarSeletor('.cards-grid');
+    const cardsGrid = selecionarSeletor('.cards-grid');
     const chatHistory = selecionarSeletor('.chat-history');
 
     let modoCards = false;
 
-    const chat_view = criarChatView({
+    const chatView = criarChatView({
         textarea,
         sendBtn,
         chatHistory,
@@ -36,10 +37,19 @@ export function inicializarApp() {
         messagesInner,
         messagesBox
     });
-    const chat_controller = criarChatController(chat_view, textarea, sendBtn);
+    const chatController = criarChatController({
+        chatView, 
+        textarea, 
+        sendBtn
+    });
 
-    const card_view = criarCardsView(cardsGride);
-    const card_controller = criarCardsController(card_view);
+    const cardsView = criarCardsView({
+        cardsGrid, 
+        cardsBox
+    });
+    const cardsController = criarCardsController({
+        cardsView
+    });
 
     textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
@@ -56,31 +66,31 @@ export function inicializarApp() {
     });
 
     // se modo Cards entao cards_chat_controller.pesquisarCards()
-    sendBtn.addEventListener('click', chat_controller.enviarPrompt);
+    sendBtn.addEventListener('click', chatController.enviarPrompt);
+
+    newCardBtn.addEventListener('click', cardsController.novoCard);
 
     cardsBtn.addEventListener('click', () => {
-        chat_view.limparTextarea();
+        chatView.limparTextarea();
         
         modoCards = !modoCards;
         if(modoCards){
             textarea.placeholder = 'Pesquise por um card...';
-
         } else {
             textarea.placeholder = 'Envie uma mensagem...';
-
         }
 
-        sendBtn.classList.toggle('hidden');
         sideBar.classList.toggle('hidden');
         lupaIcon.classList.toggle('hidden');
         setaIcon.classList.toggle('hidden');
         messagesBox.classList.toggle('hidden');
         cardsBox.classList.toggle('hidden');
+        newCardBtn.classList.toggle('hidden')
     });
 
-    newChatBtn.addEventListener('click', chat_controller.novoChat);
+    newChatBtn.addEventListener('click', chatController.novoChat);
 
-    chat_controller.inicializar();
-    card_controller.inicializar();
-    
+    chatController.inicializar();
+    cardsController.inicializar();
+    cardsBtn.click();
 }

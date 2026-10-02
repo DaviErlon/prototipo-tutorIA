@@ -4,11 +4,40 @@ import {
     apiDeletarCard,
 } from './api.js';
 
-export function criarCardsController(view) {
+export function criarCardsController({ cardsView }) {
+
+    function pegarPagina() {
+        const page = localStorage.getItem('tutor-ia-page');
+        if (page === null) {
+            localStorage.setItem('tutor-ia-page', '1');
+            return 1;
+        }
+        return Number(page);
+    }
+
+
     async function carregarCards() {
         try {
-            const cards = await apiGetCards('', 6);
-            view.renderizarCards(cards.data, deletarCard);
+            const page = pegarPagina();
+
+            const cards = await apiGetCards('', page, 6);
+
+            // voltar a pagina
+            if (cards.data.length === 0 && page > 1) {
+                localStorage.setItem(
+                    'tutor-ia-page',
+                    String(page - 1)
+                );
+                return carregarCards();
+            }
+
+            cardsView.renderizarCards(
+                cards.data,
+                deletarCard,
+                cards.pagination,
+                prevCards,
+                proxCards
+            );
             return cards;
         } catch (error) {
             console.error(error);
@@ -16,13 +45,32 @@ export function criarCardsController(view) {
         }
     }
 
-    async function novoCard(card) {
+
+    async function prevCards() {
+        const pageAtual = pegarPagina();
+        localStorage.setItem('tutor-ia-page', String(pageAtual - 1));
+        await carregarCards();
+    }
+
+
+    async function proxCards() {
+        const pageAtual = pegarPagina();
+        localStorage.setItem('tutor-ia-page', String(pageAtual + 1));
+        await carregarCards();
+    }
+
+
+    async function criarCard(title, content) {
         try {
-            await apiCriarCard(card);
+            await apiCriarCard(title, content);
             await carregarCards();
         } catch (error) {
             console.error(error);
         }
+    }
+
+    async function novoCard() {
+        cardsView.renderizarModal(criarCard);
     }
 
     async function deletarCard(id) {

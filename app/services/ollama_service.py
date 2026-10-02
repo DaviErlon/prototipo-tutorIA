@@ -6,7 +6,7 @@ import requests
 # historico: list[message], cards: list[card]
 # gerar o prompt padrao (engenharia de prompt)
 
-def send_to_llm(prompt: str):
+def send_to_llm(content: str):
     response = requests.post(
         OLLAMA_URL,
         json={
@@ -14,7 +14,7 @@ def send_to_llm(prompt: str):
             "messages": [
                 {
                     "role": "user",
-                    "content": prompt
+                    "content": content
                 }
             ],
             "stream": False
