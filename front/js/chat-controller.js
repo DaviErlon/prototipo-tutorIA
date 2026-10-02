@@ -2,6 +2,7 @@ import {
     apiCriarChat,
     apiDeletarChat,
     apiEnviarPrompt,
+    apiEnviarPromptStream,
     apiListarChats,
     apiListarMensagens
 } from './api.js';
@@ -77,6 +78,67 @@ export function criarChatController({
 
         try {
             if (chatAtualId === null) {
+                const novo = await apiCriarChat();
+                chatAtualId = novo.id;
+                chatView.limparMensagens();
+                await carregarChats();
+            }
+
+            const idDoChat = chatAtualId;
+            chatView.renderizarMensagem({ role: 'user', content: mensagem });
+            chatView.limparTextarea();
+            chatView.rolarParaOFim();
+            chatView.mostrarDigitando();
+
+            let bolha = null;
+
+            try {
+                await apiEnviarPromptStream(idDoChat, mensagem, (_chunk, textoCompleto) => {
+                    if (chatAtualId !== idDoChat) return;
+
+                    if (!bolha) {
+                        chatView.removerDigitando();
+                        bolha = chatView.iniciarMensagemStream();
+                    }
+
+                    const seguirFim = chatView.estaPertoDoFim();
+                    bolha.atualizar(textoCompleto);
+                    if (seguirFim) chatView.rolarParaOFim();
+                });
+
+                // Se o stream terminou sem nenhum pedaço, tira o "Pensando..."
+                if (!bolha && chatAtualId === idDoChat) {
+                    chatView.removerDigitando();
+                }
+            } catch (error) {
+                console.error(error);
+                if (chatAtualId === idDoChat) {
+                    chatView.removerDigitando();
+                    chatView.mostrarErro('Não foi possível obter a resposta. Tente novamente.');
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            chatView.mostrarErro('Não foi possível criar a conversa.');
+        } finally {
+            enviando = false;
+            sendBtn.disabled = textarea.value.trim().length === 0;
+            textarea.focus();
+        }
+    }
+
+    /*
+    async function enviarPrompt() {
+        if (enviando) return;
+
+        const mensagem = textarea.value.trim();
+        if (mensagem.length === 0) return;
+
+        enviando = true;
+        sendBtn.disabled = true;
+
+        try {
+            if (chatAtualId === null) {
                 chatAtualId = await apiCriarChat();
                 chatView.limparMensagens();
                 await carregarChats();
@@ -111,6 +173,7 @@ export function criarChatController({
             textarea.focus();
         }
     }
+    */
 
     async function inicializar() {
         const chats = await carregarChats();

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 
 from app.schemas.models import Prompt
-from app.services.ollama_service import send_to_llm
+from app.services.ollama_service import send_to_llm, send_to_llm_stream
 from app.services.chat_service import (
     criar_chat,
     criar_mensagem,
@@ -31,19 +32,13 @@ def criar_chat_route():
 
 @chat_router.post("/{id}")
 def promt_route(id: int, prompt: Prompt):
-
-    # executar aqui a logica de RAG
-    # busca mensagens no lite e
-    # referencias no chroma
-    # e dps chama o ollama hihi
+    res = send_to_llm(prompt.content, id)
     
     mensagem_id = criar_mensagem(
         chat_id=id,
         content=prompt.content,
         role="user"
     )
-
-    res = send_to_llm(prompt.content, id)
     
     mensagem_id = criar_mensagem(
         chat_id=id,
@@ -55,6 +50,13 @@ def promt_route(id: int, prompt: Prompt):
         "id": mensagem_id,
         "content": res
     }
+
+@chat_router.post("/chats/{chat_id}/stream")
+def prompt_stream(chat_id: int, prompt: Prompt):
+    return StreamingResponse(
+        send_to_llm_stream(prompt.content, chat_id),
+        media_type="text/plain; charset=utf-8"
+    )
 
 
 @chat_router.get("/")

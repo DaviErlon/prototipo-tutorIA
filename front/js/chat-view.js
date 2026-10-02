@@ -169,6 +169,31 @@ export function criarChatView({
         rolarParaOFim();
     }
 
+    function iniciarMensagemStream() {
+        const el = document.createElement('div');
+        el.className = 'message tutor';
+
+        const role = document.createElement('span');
+        role.className = 'role';
+        role.textContent = 'tutor';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble markdown';
+
+        el.append(role, bubble);
+        messagesInner.appendChild(el);
+
+        return {
+            atualizar(textoCompleto) {
+                bubble.innerHTML = markdownParaHTML(textoCompleto);
+            }
+        };
+    }
+
+    function estaPertoDoFim(margem = 80) {
+        return messagesBox.scrollHeight - messagesBox.scrollTop - messagesBox.clientHeight < margem;
+    }
+
     return {
         renderizarMensagem,
         rolarParaOFim,
@@ -181,5 +206,7 @@ export function criarChatView({
         renderizarEstadoVazio,
         limparMensagens,
         renderizarMensagens,
+        iniciarMensagemStream,
+        estaPertoDoFim
     };
 }

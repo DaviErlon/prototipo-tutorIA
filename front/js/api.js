@@ -37,6 +37,43 @@ export async function apiEnviarPrompt(id, content) {
     });
     return response.json();
 }
+export async function apiEnviarPromptStream(chatId, content, onChunk, signal) {
+    const res = await fetch(`${CHAT_PATH}/chats/${chatId}/stream`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+        signal
+    });
+
+    if (!res.ok || !res.body) {
+        throw new Error(`Erro HTTP ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let textoCompleto = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        // { stream: true } evita quebrar caracteres multibyte (ã, ç, é...)
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        textoCompleto += chunk;
+        onChunk(chunk, textoCompleto);
+    }
+
+    // Descarrega qualquer byte que ficou pendente no decoder
+    const resto = decoder.decode();
+    if (resto) {
+        textoCompleto += resto;
+        onChunk(resto, textoCompleto);
+    }
+
+    return textoCompleto;
+}
 
 export async function apiGetCards(value, page, limit) {
     let url = `${CARDS_PATH}/?page=${page}&limit=${limit}`;
