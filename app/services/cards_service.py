@@ -4,6 +4,15 @@ from app.databases.chroma import get_collection
 from app.schemas.models import Card
 
 
+def formatar_documento_card(title: str, content: str) -> str:
+    return f"{title}\n{content}"
+
+
+def _extrair_conteudo(document: str, title: str) -> str:
+    prefix = f"{title}\n"
+    return document[len(prefix):] if document.startswith(prefix) else document
+
+
 def criar_card(card: Card):
     collection = get_collection("cards")
 
@@ -11,7 +20,7 @@ def criar_card(card: Card):
 
     collection.add(
         ids=[card_id],
-        documents=[card.content],
+        documents=[formatar_documento_card(card.title, card.content)],
         metadatas=[
             {
                 "title": card.title
@@ -40,7 +49,10 @@ def buscar_cards_semelhantes(texto: str, limit: int = 6):
         cards.append({
             "id": resultado["ids"][0][i],
             "title": resultado["metadatas"][0][i]["title"],
-            "content": resultado["documents"][0][i],
+            "content": _extrair_conteudo(
+                resultado["documents"][0][i],
+                resultado["metadatas"][0][i]["title"]
+            ),
             "distance": resultado["distances"][0][i]
         })
 
@@ -73,7 +85,10 @@ def listar_cards(page: int = 1, limit: int = 6):
         cards.append({
             "id": resultado["ids"][i],
             "title": resultado["metadatas"][i]["title"],
-            "content": resultado["documents"][i]
+            "content": _extrair_conteudo(
+                resultado["documents"][i],
+                resultado["metadatas"][i]["title"]
+            )
         })
 
     return {
