@@ -13,7 +13,7 @@ from app.services.chat_service import listar_mensagens, criar_mensagem
 def generate_default_prompt(content: str, chat_id: int):
     
     messages = listar_mensagens(chat_id)[-8:]
-    cards = buscar_cards_semelhantes(content, limit=3)
+    cards = buscar_cards_semelhantes(content, limit=1)
 
     system_content = """
 Você é a TutorIA, uma inteligência artificial responsável por auxiliar
@@ -28,6 +28,10 @@ Nunca mencione os cards ou o processo de recuperação de contexto ao usuário.
 Utilize o conteúdo dos cards como material de apoio, mas não invente
 informações que não estejam presentes no contexto ou que você não saiba.
 
+Ao responder perguntas que pedem identificar uma pessoa por características,
+verifique todas as características no mesmo card e responda com o título
+desse card. Não transfira informações entre pessoas diferentes.
+
 CARDS DE CONTEXTO:
 """
 
@@ -35,6 +39,7 @@ CARDS DE CONTEXTO:
         system_content += f"""
 
 --- CARD {i} ---
+Título: {card["title"]}
 {card["content"]}
 
 """

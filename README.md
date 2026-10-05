@@ -12,5 +12,9 @@ instalar as dependencias:
 executar com:
     uvicorn app.main:app --reload
 
+importar os cards de teste:
+python -m app.import_cards
+
+Coloquei esse troço aí pra importar os card belê
 
 tarefas: desenvolver o front e inserir os cards, morô?
