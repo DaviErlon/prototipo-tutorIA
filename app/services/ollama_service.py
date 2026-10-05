@@ -73,12 +73,17 @@ def send_to_llm(content: str, chat_id: int):
             }
         }
     )
-
     response.raise_for_status()
-
     data = response.json()
+    res = data["message"]["content"]
 
-    return data["message"]["content"]
+    criar_mensagem(chat_id, role="user", content=content)
+    message_id = criar_mensagem(chat_id, role="assistant", content=res)
+
+    return {
+        "id": message_id,
+        "content": res
+    }
 
 
 def send_to_llm_stream(content: str, chat_id: int):

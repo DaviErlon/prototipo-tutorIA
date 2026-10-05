@@ -32,24 +32,7 @@ def criar_chat_route():
 
 @chat_router.post("/{id}")
 def promt_route(id: int, prompt: Prompt):
-    res = send_to_llm(prompt.content, id)
-    
-    mensagem_id = criar_mensagem(
-        chat_id=id,
-        content=prompt.content,
-        role="user"
-    )
-    
-    mensagem_id = criar_mensagem(
-        chat_id=id,
-        content=res,
-        role="assistant"
-    )
-
-    return {
-        "id": mensagem_id,
-        "content": res
-    }
+    return send_to_llm(prompt.content, id)
 
 @chat_router.post("/chats/{chat_id}/stream")
 def prompt_stream(chat_id: int, prompt: Prompt):
@@ -82,3 +65,4 @@ def deletar_chat_route(id: int):
     return {
         "message": "Chat deletado"
     }
+

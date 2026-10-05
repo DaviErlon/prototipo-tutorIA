@@ -56,7 +56,7 @@ export function criarChatController({
                 chatAtualId = null;
                 if (chats.length > 0) {
                     const maisRecente = Math.max(...chats.map((chat) => chat.id));
-                    await abrirChat(maisRecente.id);
+                    await abrirChat(maisRecente);
                 } else {
                     chatView.renderizarEstadoVazio();
                 }

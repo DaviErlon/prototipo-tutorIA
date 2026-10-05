@@ -84,6 +84,9 @@ export function inicializarApp() {
         }
     });
 
+    newCardBtn.addEventListener('click', cardsController.novoCard);
+    newChatBtn.addEventListener('click', chatController.novoChat);
+
     sendBtn.addEventListener('click', () => {
         if (modoCards) {
             cardsController.buscarCards();
