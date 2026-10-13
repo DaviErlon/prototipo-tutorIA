@@ -12,50 +12,48 @@ from app.services.chat_service import listar_mensagens, criar_mensagem
 
 def generate_default_prompt(content: str, chat_id: int):
     
-    messages = listar_mensagens(chat_id)[-8:]
-    cards = buscar_cards_semelhantes(content, limit=1)
+    messages = listar_mensagens(chat_id)[-4:]
+    chunks = buscar_cards_semelhantes(content, limit=3)
+
+    # filtro de chunks aqui
 
     system_content = """
 Você é a TutorIA, uma inteligência artificial responsável por auxiliar
-o usuário em seus estudos.
+os universitários da universidade Unopar em suas dúvidas acadêmicas e institucionais.
 
-Você pode utilizar o material dos cards fornecidos abaixo para embasar
-suas respostas. Os cards são materiais de estudo recuperados por
+Você pode utilizar o material fornecido abaixo para embasar
+suas respostas. Os chunks são materiais de estudo recuperados por
 similaridade e podem ser utilizados como contexto adicional.
 
-Nunca mencione os cards ou o processo de recuperação de contexto ao usuário.
+Nunca mencione os chunks ou o processo de recuperação de contexto ao usuário.
 
-Utilize o conteúdo dos cards como material de apoio, mas não invente
-informações que não estejam presentes no contexto ou que você não saiba.
+Se não houver chunks de contexto, diga ao usuário educadamente que não sabe
+responder a pergunta e sugira o transbordo humano para o e-mail assistance@unopar.com
 
-Ao responder perguntas que pedem identificar uma pessoa por características,
-verifique todas as características no mesmo card e responda com o título
-desse card. Não transfira informações entre pessoas diferentes.
-
-CARDS DE CONTEXTO:
+CHUNKS DE CONTEXTO: [
 """
-
-    for i, card in enumerate(cards, start=1):
+    for i, chunk in enumerate(chunks, start=1):
         system_content += f"""
-
---- CARD {i} ---
-Título: {card["title"]}
-{card["content"]}
+--- CHUNK {i} ---
+{chunk["content"]}
 
 """
+    system_content += "\n]"
 
-    prompt = [
-        {
-            "role": "system",
-            "content": system_content.strip()
-        }
-    ]
+    prompt = []
 
     for message in messages:
         prompt.append({
             "role": message["role"],
             "content": message["content"]
         })
+
+    prompt.append(
+        {
+            "role": "system",
+            "content": system_content.strip()
+        }
+    )
 
     if content:
         prompt.append({
