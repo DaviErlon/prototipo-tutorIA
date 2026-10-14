@@ -7,3 +7,4 @@ chat.db
 chroma_data/
 
 chunks.json
+chunks.csv
