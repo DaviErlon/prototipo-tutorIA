@@ -18,3 +18,4 @@ app.mount(
     StaticFiles(directory="front", html=True),
     name="frontend"
 )
+
