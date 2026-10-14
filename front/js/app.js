@@ -1,7 +1,7 @@
 import { criarChatController } from './chat-controller.js';
 import { criarChatView } from './chat-view.js';
-import { criarCardsController } from './cards-controller.js';
-import { criarCardsView } from './cards-view.js';
+import { criarChunksController } from './chunks-controller.js';
+import { criarChunksView } from './chunks-view.js';
 
 function selecionarSeletor(seletor) {
     const elemento = document.querySelector(seletor);
@@ -14,20 +14,20 @@ function selecionarSeletor(seletor) {
 export function inicializarApp() {
     const textarea = selecionarSeletor('.text');
     const sendBtn = selecionarSeletor('#send-btn');
-    const newCardBtn = selecionarSeletor('#new-card-btn');
+    const newChunkBtn = selecionarSeletor('#new-chunk-btn');
     const lupaIcon = selecionarSeletor('.lupa');
     const setaIcon = selecionarSeletor('.seta');
     const sideBar = selecionarSeletor('.sidebar');
     const newChatBtn = selecionarSeletor('#new-chat-btn');
     const chatHeader = selecionarSeletor('.chat-header');
-    const cardsBtn = selecionarSeletor('#header-btn');
+    const chunksBtn = selecionarSeletor('#header-btn');
     const messagesInner = selecionarSeletor('.messages-inner');
     const messagesBox = selecionarSeletor('.messages');
-    const cardsBox = selecionarSeletor('.cards');
-    const cardsGrid = selecionarSeletor('.cards-grid');
+    const chunksBox = selecionarSeletor('.chunks');
+    const chunksGrid = selecionarSeletor('.chunks-grid');
     const chatHistory = selecionarSeletor('.chat-history');
 
-    let modoCards = false;
+    let modoChunks = false;
 
     const chatView = criarChatView({
         textarea,
@@ -43,12 +43,12 @@ export function inicializarApp() {
         sendBtn
     });
 
-    const cardsView = criarCardsView({
-        cardsGrid,
-        cardsBox
+    const chunksView = criarChunksView({
+        chunksGrid,
+        chunksBox
     });
-    const cardsController = criarCardsController({
-        cardsView,
+    const chunksController = criarChunksController({
+        chunksView,
         textarea
     });
 
@@ -60,17 +60,17 @@ export function inicializarApp() {
 
         sendBtn.disabled = textarea.value.trim().length === 0;
 
-        if (!modoCards) return;
+        if (!modoChunks) return;
 
         clearTimeout(timerPesquisa);
 
         if (textarea.value.trim() === '') {
-            cardsController.carregarCards();
+            chunksController.carregarChunks();
             return;
         }
 
         timerPesquisa = setTimeout(() => {
-            cardsController.buscarCards();
+            chunksController.buscarChunks();
         }, 1000);
     });
 
@@ -84,23 +84,23 @@ export function inicializarApp() {
         }
     });
 
-    newCardBtn.addEventListener('click', cardsController.novoCard);
+    newChunkBtn.addEventListener('click', chunksController.novoChunk);
     newChatBtn.addEventListener('click', chatController.novoChat);
 
     sendBtn.addEventListener('click', () => {
-        if (modoCards) {
-            cardsController.buscarCards();
+        if (modoChunks) {
+            chunksController.buscarChunks();
         } else {
             chatController.enviarPrompt();
         }
     });
 
-    cardsBtn.addEventListener('click', () => {
+    chunksBtn.addEventListener('click', () => {
         chatView.limparTextarea();
 
-        modoCards = !modoCards;
-        if (modoCards) {
-            textarea.placeholder = 'Pesquise por um card...';
+        modoChunks = !modoChunks;
+        if (modoChunks) {
+            textarea.placeholder = 'Pesquise por um chunk...';
         } else {
             textarea.placeholder = 'Envie uma mensagem...';
         }
@@ -109,11 +109,11 @@ export function inicializarApp() {
         lupaIcon.classList.toggle('hidden');
         setaIcon.classList.toggle('hidden');
         messagesBox.classList.toggle('hidden');
-        cardsBox.classList.toggle('hidden');
-        newCardBtn.classList.toggle('hidden')
+        chunksBox.classList.toggle('hidden');
+        newChunkBtn.classList.toggle('hidden');
     });
 
 
     chatController.inicializar();
-    cardsController.inicializar();
+    chunksController.inicializar();
 }

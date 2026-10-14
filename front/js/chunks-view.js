@@ -1,10 +1,10 @@
-export function criarCardsView({
-    cardsGrid,
-    cardsBox
+export function criarChunksView({
+    chunksGrid,
+    chunksBox
 }) {
 
     function renderizarEstadoVazio() {
-        cardsGrid.innerHTML = '';
+        chunksGrid.innerHTML = '';
 
         const el = document.createElement('div');
         el.className = 'message tutor';
@@ -15,54 +15,59 @@ export function criarCardsView({
 
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.textContent = 'Olá! Crie um card para me auxiliar nas suas perguntas!';
+        bubble.textContent = 'Olá! Crie um chunk para me auxiliar nas suas perguntas!';
 
         el.append(role, bubble);
-        cardsGrid.appendChild(el);
+        chunksGrid.appendChild(el);
     }
 
 
-    function renderizarCard(card, deletarCard) {
+    function renderizarChunk(chunk, deletarChunk) {
         const el = document.createElement('div');
-        el.className = 'card';
-        el.dataset.id = card.id;
-
+        el.className = 'chunk';
+        el.dataset.id = chunk.id;
 
         const header = document.createElement('div');
-        header.className = 'card-header';
-
-        const title = document.createElement('span');
-        title.className = 'card-title';
-        title.textContent = card.title;
+        header.className = 'chunk-header';
 
         const btnDeletar = document.createElement('button');
         btnDeletar.className = 'delete-btn';
         btnDeletar.type = 'button';
-        btnDeletar.title = 'Deletar card';
+        btnDeletar.title = 'Deletar chunk';
         btnDeletar.innerHTML = '&times;';
 
         btnDeletar.addEventListener('click', (event) => {
             event.stopPropagation();
-            deletarCard(card.id);
+            deletarChunk(chunk.id);
         });
 
         const content = document.createElement('div');
-        content.className = 'card-content';
-        content.textContent = card.content;
+        content.className = 'chunk-content';
+        content.textContent = chunk.content;
 
-        header.append(title, btnDeletar);
+        // A distância só vem nos resultados de busca (não na listagem paginada)
+        if (typeof chunk.distance === 'number') {
+            const distancia = document.createElement('span');
+            distancia.className = 'chunk-distance';
+            distancia.title = 'Distância semântica: quanto menor, mais parecido com a busca';
+            distancia.textContent = `distância: ${chunk.distance.toFixed(3)}`;
+            // fica direto no card (posição absoluta), fora do fluxo do texto
+            el.append(distancia);
+        }
+
+        header.append(btnDeletar);
         el.append(header, content);
 
-        cardsGrid.appendChild(el);
+        chunksGrid.appendChild(el);
     }
 
     function renderizarSetas(
         pagination,
-        prevCards,
-        proxCards
+        prevChunks,
+        proxChunks
     ) {
         // Remove as setas antigas
-        cardsBox.querySelectorAll('.pagination-btn').forEach(btn => btn.remove());
+        chunksBox.querySelectorAll('.pagination-btn').forEach(btn => btn.remove());
 
         if (!pagination) {
             return;
@@ -78,10 +83,10 @@ export function criarCardsView({
             btnAnterior.title = 'Página anterior';
             btnAnterior.addEventListener(
                 'click',
-                prevCards
+                prevChunks
             );
 
-            cardsBox.prepend(btnAnterior);
+            chunksBox.prepend(btnAnterior);
         }
 
 
@@ -93,16 +98,16 @@ export function criarCardsView({
             btnProxima.type = 'button';
             btnProxima.innerHTML = '&#10095;';
             btnProxima.title = 'Próxima página';
-            btnProxima.addEventListener('click', proxCards);
+            btnProxima.addEventListener('click', proxChunks);
 
-            cardsBox.appendChild(btnProxima);
+            chunksBox.appendChild(btnProxima);
         }
     }
 
-    function renderizarModal(criarCard) {
+    function renderizarModal(criarChunk) {
         const modal = document.createElement('div');
         modal.className = 'modal';
-        modal.id = 'card-modal';
+        modal.id = 'chunk-modal';
 
         const modalContent = document.createElement('div');
         modalContent.className = 'modal-content';
@@ -111,37 +116,27 @@ export function criarCardsView({
         modalHeader.className = 'modal-header';
 
         const titulo = document.createElement('h2');
-        titulo.textContent = 'Novo card';
+        titulo.textContent = 'Novo chunk';
 
         const fecharBtn = document.createElement('button');
         fecharBtn.id = 'fechar-modal-btn';
         fecharBtn.textContent = '×';
 
         const form = document.createElement('form');
-        form.id = 'card-form';
-
-        const titleLabel = document.createElement('label');
-        titleLabel.htmlFor = 'card-title';
-        titleLabel.textContent = 'Título';
-
-        const titleInput = document.createElement('input');
-        titleInput.id = 'card-title';
-        titleInput.type = 'text';
-        titleInput.placeholder = 'Título do card';
-        titleInput.required = true;
+        form.id = 'chunk-form';
 
         const contentLabel = document.createElement('label');
-        contentLabel.htmlFor = 'card-content';
+        contentLabel.htmlFor = 'chunk-content';
         contentLabel.textContent = 'Conteúdo';
 
         const contentInput = document.createElement('textarea');
-        contentInput.id = 'card-content';
-        contentInput.placeholder = 'Conteúdo do card...';
+        contentInput.id = 'chunk-content';
+        contentInput.placeholder = 'Conteúdo do chunk...';
         contentInput.required = true;
 
         const submitBtn = document.createElement('button');
         submitBtn.type = 'submit';
-        submitBtn.textContent = 'Criar card';
+        submitBtn.textContent = 'Criar chunk';
 
         modalHeader.append(
             titulo,
@@ -149,8 +144,6 @@ export function criarCardsView({
         );
 
         form.append(
-            titleLabel,
-            titleInput,
             contentLabel,
             contentInput,
             submitBtn
@@ -175,50 +168,49 @@ export function criarCardsView({
 
             event.preventDefault();
 
-            const title = titleInput.value;
             const content = contentInput.value;
 
-            await criarCard(title, content);
+            await criarChunk(content);
             remover();
         });
     }
 
-    function renderizarCards(
-        cards,
-        deletarCard,
+    function renderizarChunks(
+        chunks,
+        deletarChunk,
         pagination,
-        prevCards,
-        proxCards
+        prevChunks,
+        proxChunks
     ) {
-        cardsGrid.innerHTML = '';
+        chunksGrid.innerHTML = '';
 
-        if ((!cards || cards.length === 0 ) && pagination) {
+        if ((!chunks || chunks.length === 0) && pagination) {
             renderizarEstadoVazio();
-            renderizarSetas(pagination, prevCards, proxCards);
+            renderizarSetas(pagination, prevChunks, proxChunks);
             return;
         }
 
-        cards.forEach(card => {
-            renderizarCard(
-                card,
-                deletarCard
+        chunks.forEach(chunk => {
+            renderizarChunk(
+                chunk,
+                deletarChunk
             );
         });
 
-        renderizarSetas(pagination, prevCards, proxCards);
+        renderizarSetas(pagination, prevChunks, proxChunks);
     }
 
-    function limparCards() {
-        cardsGrid.innerHTML = '';
-        cardsBox.querySelectorAll('.pagination-btn').forEach(btn => btn.remove());
+    function limparChunks() {
+        chunksGrid.innerHTML = '';
+        chunksBox.querySelectorAll('.pagination-btn').forEach(btn => btn.remove());
     }
 
     return {
-        renderizarCard,
-        renderizarCards,
+        renderizarChunk,
+        renderizarChunks,
         renderizarEstadoVazio,
         renderizarSetas,
-        limparCards,
+        limparChunks,
         renderizarModal
     };
 }

@@ -1,5 +1,5 @@
 const CHAT_PATH = '/api/chat';
-const CARDS_PATH = '/api/cards';
+const CHUNKS_PATH = '/api/chunks';
 
 async function solicitar(url, options) {
     const response = await fetch(url, options);
@@ -75,26 +75,26 @@ export async function apiEnviarPromptStream(chatId, content, onChunk, signal) {
     return textoCompleto;
 }
 
-export async function apiBuscarCards(value, page, limit) {
-    let url = `${CARDS_PATH}/?page=${page}&limit=${limit}`;
+export async function apiBuscarChunks(value, page, limit) {
+    let url = `${CHUNKS_PATH}/?page=${page}&limit=${limit}`;
 
     if (value && value.trim() !== '') {
-        url += `&key=${value}`;
+        url += `&key=${encodeURIComponent(value)}`;
     }
     const response = await solicitar(url);
     return response.json();
 }
 
-export async function apiCriarCard(title, content) {
-    const response = await solicitar(`${CARDS_PATH}/`, {
+export async function apiCriarChunk(content) {
+    const response = await solicitar(`${CHUNKS_PATH}/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({title, content})
+        body: JSON.stringify({ content })
     });
     return response.json();
 }
 
-export async function apiDeletarCard(id) {
-    const response = await solicitar(`${CARDS_PATH}/${id}`, {method: 'DELETE'});
+export async function apiDeletarChunk(id) {
+    const response = await solicitar(`${CHUNKS_PATH}/${id}`, { method: 'DELETE' });
     return response.json();
 }

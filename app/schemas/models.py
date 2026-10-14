@@ -3,8 +3,7 @@ from pydantic import BaseModel
 class Prompt(BaseModel):
     content: str
 
-class Card(BaseModel):
-    title: str
+class Chunk(BaseModel):
     content: str
 
 class Message(BaseModel):

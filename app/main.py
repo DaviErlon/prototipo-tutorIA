@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from app.routes.chat_route import chat_router
-from app.routes.cards_route import cards_router
+from app.routes.chunks_route import chunks_router
 
 app = FastAPI(
 #    docs_url=None,
@@ -11,7 +11,7 @@ app = FastAPI(
 )
 
 app.include_router(chat_router)
-app.include_router(cards_router)
+app.include_router(chunks_router)
 
 app.mount(
     "/",
