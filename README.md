@@ -1,20 +1,13 @@
-to usando o python 3.10.20
-qualquer erro ja desconfia da versao kkkk
-
-instalem o ollama, dps baixa o embed que o codigo ta usando:
-    ollama pull nomic-embed-text
-
-(se quiser confere se baixou memo com "ollama list")
-
 instalar as dependencias:
     pip install -r requirements.txt
 
 executar com:
-    uvicorn app.main:app --reload
+    uvicorn app.cmd.main:app --reload
 
-importar os cards de teste:
-python -m app.import_cards
+extrair chunks de pdfs em documents/ para chunking/chunks.csv :
+python -m app.cmd.ingest
 
-Coloquei esse troço aí pra importar os card belê
+vetorizar e lançar os chunking/chunks.csv para o postgres:
+python -m app.cmd.ingest
 
-tarefas: desenvolver o front e inserir os cards, morô?
+tarefas: consulta hibrida =O

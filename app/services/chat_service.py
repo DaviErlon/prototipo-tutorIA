@@ -1,17 +1,30 @@
-from app.databases.lite import get_connection
+from app.databases.postgres import get_connection
+
+# Pressupostos sobre get_connection():
+# - retorna uma conexão do psycopg 3 (psycopg.connect(...))
+# - usa row_factory=dict_row, para que fetchall()/fetchone() devolvam dicts
+#   (com psycopg2, use cursor_factory=RealDictCursor e troque
+#   connection.execute(...) por connection.cursor().execute(...))
+
 
 def criar_chat():
     connection = get_connection()
 
-    cursor = connection.execute(
-        """
-        INSERT INTO chat DEFAULT VALUES
-        """
-    )
+    try:
+        cursor = connection.execute(
+            """
+            INSERT INTO chat DEFAULT VALUES
+            RETURNING id
+            """
+        )
 
-    connection.commit()
-    chat_id = cursor.lastrowid
-    connection.close()
+        chat_id = cursor.fetchone()["id"]
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
     return chat_id
 
@@ -19,17 +32,23 @@ def criar_chat():
 def criar_mensagem(chat_id: int, content: str, role: str):
     connection = get_connection()
 
-    cursor = connection.execute(
-        """
-        INSERT INTO message (content, role, chat_id)
-        VALUES (?, ?, ?)
-        """,
-        (content, role, chat_id)
-    )
+    try:
+        cursor = connection.execute(
+            """
+            INSERT INTO message (content, role, chat_id)
+            VALUES (%s, %s, %s)
+            RETURNING id
+            """,
+            (content, role, chat_id)
+        )
 
-    connection.commit()
-    message_id = cursor.lastrowid
-    connection.close()
+        message_id = cursor.fetchone()["id"]
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
     return message_id
 
@@ -37,15 +56,16 @@ def criar_mensagem(chat_id: int, content: str, role: str):
 def listar_chats():
     connection = get_connection()
 
-    chats = connection.execute(
-        """
-        SELECT id
-        FROM chat
-        ORDER BY id
-        """
-    ).fetchall()
-
-    connection.close()
+    try:
+        chats = connection.execute(
+            """
+            SELECT id
+            FROM chat
+            ORDER BY id
+            """
+        ).fetchall()
+    finally:
+        connection.close()
 
     return [dict(chat) for chat in chats]
 
@@ -53,17 +73,18 @@ def listar_chats():
 def listar_mensagens(chat_id: int):
     connection = get_connection()
 
-    messages = connection.execute(
-        """
-        SELECT id, content, role, sent_at, chat_id
-        FROM message
-        WHERE chat_id = ?
-        ORDER BY sent_at ASC, id ASC
-        """,
-        (chat_id,)
-    ).fetchall()
-
-    connection.close()
+    try:
+        messages = connection.execute(
+            """
+            SELECT id, content, role, sent_at, chat_id
+            FROM message
+            WHERE chat_id = %s
+            ORDER BY sent_at ASC, id ASC
+            """,
+            (chat_id,)
+        ).fetchall()
+    finally:
+        connection.close()
 
     return [dict(message) for message in messages]
 
@@ -71,16 +92,21 @@ def listar_mensagens(chat_id: int):
 def deletar_chat(chat_id: int):
     connection = get_connection()
 
-    cursor = connection.execute(
-        """
-        DELETE FROM chat
-        WHERE id = ?
-        """,
-        (chat_id,)
-    )
+    try:
+        cursor = connection.execute(
+            """
+            DELETE FROM chat
+            WHERE id = %s
+            """,
+            (chat_id,)
+        )
 
-    connection.commit()
-    deletado = cursor.rowcount > 0
-    connection.close()
+        deletado = cursor.rowcount > 0
+        connection.commit()
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
     return deletado

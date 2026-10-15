@@ -5,6 +5,9 @@ class Prompt(BaseModel):
 
 class Chunk(BaseModel):
     content: str
+    document: str = ""
+    page: int = 1
+    type: str = "text"
 
 class Message(BaseModel):
     id: int

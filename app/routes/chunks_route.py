@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.schemas.models import Chunk
-from app.services.chunks_service import (
+from app.services.chunk_service import (
     criar_chunk,
     listar_chunks,
     deletar_chunk,
