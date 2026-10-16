@@ -34,10 +34,7 @@ def limpar(texto: str) -> str:
     return re.sub(r"^\d(?:\s?\d)?\s+", "", texto)       # número de página no início
 
 
-def criar_splitter(
-    chunk_size: int = CHUNK_SIZE,
-    overlap: int = OVERLAP,
-) -> RecursiveCharacterTextSplitter:
+def criar_splitter(chunk_size: int = CHUNK_SIZE, overlap: int = OVERLAP,) -> RecursiveCharacterTextSplitter:
     return RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=overlap,
@@ -46,11 +43,7 @@ def criar_splitter(
     )
 
 
-def extrair_chunks_pdf(
-    pdf_path,
-    splitter: RecursiveCharacterTextSplitter | None = None,
-    min_chunk: int = MIN_CHUNK,
-) -> list[dict]:
+def extrair_chunks_pdf(pdf_path, splitter: RecursiveCharacterTextSplitter | None = None,min_chunk: int = MIN_CHUNK,) -> list[dict]:
     pdf_path = Path(pdf_path).resolve()
     splitter = splitter or criar_splitter()
     linhas = []

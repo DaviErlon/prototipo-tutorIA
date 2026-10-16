@@ -1,13 +1,10 @@
 import json
-import logging
 
 import requests
 
 from app.config.settings import SYSTEM_PROMPT,OLLAMA_URL, MODEL, TEMPERATURE, MAX_TOKENS, EMAIL_SUPORT
 from app.services.chunk_service import buscar_chunks_semelhantes
 from app.services.chat_service import listar_mensagens, criar_mensagem
-
-logger = logging.getLogger(__name__)
 
 # Parâmetros do pipeline de RAG
 MAX_MESSAGES = 4
@@ -17,7 +14,6 @@ TIMEOUT = (5, 120)  # (conexão, leitura) em segundos
 
 # Reaproveita a conexão HTTP entre as requisições
 _session = requests.Session()
-
 
 def _buscar_chunks(content: str) -> list[dict]:
     if not content:
@@ -83,7 +79,7 @@ def _salvar_troca(chat_id: int, pergunta: str, resposta: str):
 
 def send_to_llm(content: str, chat_id: int):
     (prompt, chunks) = generate_default_prompt(content, chat_id)
-    logger.debug("Prompt enviado à LLM: %s", prompt)
+    # print("Prompt enviado à LLM: %s", prompt)
 
     response = _session.post(
         OLLAMA_URL,
@@ -104,7 +100,7 @@ def send_to_llm(content: str, chat_id: int):
 
 def send_to_llm_stream(content: str, chat_id: int):
     (prompt, _) = generate_default_prompt(content, chat_id)
-    logger.debug("Prompt enviado à LLM: %s", prompt)
+    # print("Prompt enviado à LLM: %s", prompt)
 
     with _session.post(
         OLLAMA_URL,

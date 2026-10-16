@@ -2,8 +2,3 @@
 .venv
 __pycache__/
 *.pyc
-
-chat.db
-chroma_data/
-
-chunks.csv

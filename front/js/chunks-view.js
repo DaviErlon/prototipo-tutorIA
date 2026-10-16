@@ -46,11 +46,11 @@ export function criarChunksView({
         content.textContent = chunk.content;
 
         // A distância só vem nos resultados de busca (não na listagem paginada)
-        if (typeof chunk.distance === 'number') {
+        if (typeof chunk.score === 'number') {
             const distancia = document.createElement('span');
             distancia.className = 'chunk-distance';
             distancia.title = 'Distância semântica: quanto menor, mais parecido com a busca';
-            distancia.textContent = `distância: ${chunk.distance.toFixed(3)}`;
+            distancia.textContent = `score: ${chunk.score.toFixed(3)}`;
             // fica direto no card (posição absoluta), fora do fluxo do texto
             el.append(distancia);
         }

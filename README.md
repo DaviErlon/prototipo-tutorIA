@@ -1,6 +1,10 @@
 instalar as dependencias:
     pip install -r requirements.txt
 
+extensoes postgres:
+    - pg vector
+    - pg search
+
 executar com:
     uvicorn app.cmd.main:app --reload
 

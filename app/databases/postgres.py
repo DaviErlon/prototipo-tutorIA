@@ -21,6 +21,11 @@ def create_tables():
             CREATE EXTENSION IF NOT EXISTS vector
         """)
 
+        # Extensão para busca lexical BM25 (ParadeDB).
+        conn.execute("""
+            CREATE EXTENSION IF NOT EXISTS pg_search
+        """)
+
         # ENUM dos tipos de chunk.
         conn.execute("""
             DO $$
@@ -69,12 +74,16 @@ def create_tables():
                 document TEXT NOT NULL,
                 page INTEGER NOT NULL CHECK (page > 0),
                 type type_doc NOT NULL DEFAULT 'text',
-                vector_embedding VECTOR(768) NOT NULL,
-
-                busca_textual TSVECTOR GENERATED ALWAYS AS (
-                    to_tsvector('portuguese', content)
-                ) STORED
+                vector_embedding VECTOR(768) NOT NULL
             )
+        """)
+
+        # Limpeza da busca textual antiga (tsvector), para bancos já existentes.
+        conn.execute("""
+            DROP INDEX IF EXISTS idx_chunks_busca_textual
+        """)
+        conn.execute("""
+            ALTER TABLE chunks DROP COLUMN IF EXISTS busca_textual
         """)
 
         # Índice para carregar mensagens de um chat em ordem.
@@ -83,10 +92,15 @@ def create_tables():
             ON message (chat_id, sent_at, id)
         """)
 
-        # Índice lexical.
+        # Índice lexical BM25 (apenas um índice BM25 por tabela;
+        # key_field precisa ser único).
         conn.execute("""
-            CREATE INDEX IF NOT EXISTS idx_chunks_busca_textual
-            ON chunks USING GIN (busca_textual)
+            CREATE INDEX IF NOT EXISTS idx_chunks_bm25
+            ON chunks USING bm25 (
+                id,
+                (content::pdb.simple('stemmer=portuguese'))
+            )
+            WITH (key_field = 'id')
         """)
 
         # Índice vetorial aproximado.

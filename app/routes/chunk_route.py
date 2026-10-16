@@ -7,7 +7,7 @@ from app.services.chunk_service import (
     buscar_chunks_semelhantes
 )
 
-chunks_router = APIRouter(
+chunk_router = APIRouter(
     prefix="/api/chunks"
 )
 
@@ -15,7 +15,7 @@ chunks_router = APIRouter(
 # criar chunks
 # deletar chunks
 
-@chunks_router.get("/")
+@chunk_router.get("/")
 def listar_chunks_route(key: str | None = None, page: int = 1, limit: int = 6):
     if key is not None:
         return buscar_chunks_semelhantes(key, limit)
@@ -23,11 +23,11 @@ def listar_chunks_route(key: str | None = None, page: int = 1, limit: int = 6):
         return listar_chunks(page, limit)
 
 
-@chunks_router.post("/")
+@chunk_router.post("/")
 def criar_chunk_route(chunk: Chunk):
     return criar_chunk(chunk)
 
 
-@chunks_router.delete("/{id}")
+@chunk_router.delete("/{id}")
 def deletar_chunk_route(id: str):
     return deletar_chunk(id)
