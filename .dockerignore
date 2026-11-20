@@ -1,0 +1,14 @@
+
+.venv
+venv
+__pycache__
+.git
+.pytest_cache
+.env
+.env.example
+README.md
+*.pyc
+
+app/cmd/ingest_pdf.py
+
+documents

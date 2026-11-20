@@ -1,0 +1,98 @@
+services:
+  pg:
+    image: docker.io/paradedb/paradedb:latest-pg17
+    container_name: pg
+    env_file: .env.db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - net01
+    restart: unless-stopped
+
+  ollama-api:
+    image: docker.io/ollama/ollama:latest
+    container_name: ollama-api
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - net01
+    restart: unless-stopped
+
+  # Baixa os modelos e termina. Se já existirem no volume, o pull é rápido.
+  ollama-pull:
+    image: docker.io/ollama/ollama:latest
+    container_name: ollama-pull
+    environment:
+      OLLAMA_HOST: http://ollama-api:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        ollama pull nomic-embed-text &&
+        ollama pull qwen3.5:2b
+    depends_on:
+      ollama-api:
+        condition: service_healthy
+    networks:
+      - net01
+    restart: "no"
+
+  tutoria-api:
+    build: .
+    image: localhost/tutoria:latest
+    container_name: tutoria-api
+    env_file:
+      - .env
+      - .env.db
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      pg:
+        condition: service_healthy
+      ollama-api:
+        condition: service_healthy
+    networks:
+      - net01
+    restart: unless-stopped
+
+  # Equivale ao: podman exec tutoria-api python -m app.cmd.csv_to_bd
+  csv-loader:
+    image: localhost/tutoria:latest
+    container_name: csv-loader
+    env_file:
+      - .env
+      - .env.db
+    command: ["python", "-m", "app.cmd.csv_to_bd"]
+    depends_on:
+      tutoria-api:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    networks:
+      - net01
+    restart: "no"
+
+volumes:
+  postgres_data:
+    name: postgres_data
+  ollama_data:
+    name: ollama_data
+
+networks:
+  net01:
+    name: net01

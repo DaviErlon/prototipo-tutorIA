@@ -1,19 +1,29 @@
-import json
+import httpx
+from ollama import Client
 
-import requests
-
-from app.config.settings import SYSTEM_PROMPT,OLLAMA_URL, MODEL, TEMPERATURE, MAX_TOKENS, EMAIL_SUPORT
+from app.config.settings import (
+    SYSTEM_PROMPT, OLLAMA_HOST, MODEL, TEMPERATURE, MAX_TOKENS, EMAIL_SUPORT
+)
 from app.services.chunk_service import buscar_chunks_semelhantes
 from app.services.chat_service import listar_mensagens, criar_mensagem
 
 # Parâmetros do pipeline de RAG
 MAX_MESSAGES = 4
 MAX_CHUNKS = 3
-MAX_DISTANCE = 0.80
-TIMEOUT = (5, 120)  # (conexão, leitura) em segundos
+MAX_DISTANCE = 0.50
 
-# Reaproveita a conexão HTTP entre as requisições
-_session = requests.Session()
+# Client criado uma única vez e reaproveitado (mantém a conexão HTTP aberta).
+# O timeout é repassado ao httpx: 5s para conectar, 120s para leitura.
+_client = Client(
+    host=OLLAMA_HOST,
+    timeout=httpx.Timeout(120.0, connect=5.0),
+)
+
+_OPTIONS = {
+    "temperature": TEMPERATURE,
+    "num_predict": MAX_TOKENS,
+}
+
 
 def _buscar_chunks(content: str) -> list[dict]:
     if not content:
@@ -60,18 +70,6 @@ def generate_default_prompt(content: str, chat_id: int):
     return (prompt, chunks)
 
 
-def _montar_payload(prompt: list[dict], stream: bool) -> dict:
-    return {
-        "model": MODEL,
-        "messages": prompt,
-        "stream": stream,
-        "options": {
-            "temperature": TEMPERATURE,
-            "num_predict": MAX_TOKENS
-        }
-    }
-
-
 def _salvar_troca(chat_id: int, pergunta: str, resposta: str):
     criar_mensagem(chat_id, role="user", content=pergunta)
     return criar_mensagem(chat_id, role="assistant", content=resposta)
@@ -79,16 +77,15 @@ def _salvar_troca(chat_id: int, pergunta: str, resposta: str):
 
 def send_to_llm(content: str, chat_id: int):
     (prompt, chunks) = generate_default_prompt(content, chat_id)
-    # print("Prompt enviado à LLM: %s", prompt)
 
-    response = _session.post(
-        OLLAMA_URL,
-        json=_montar_payload(prompt, stream=False),
-        timeout=TIMEOUT
+    response = _client.chat(
+        model=MODEL,
+        messages=prompt,
+        options=_OPTIONS,
+        stream=False,
     )
-    response.raise_for_status()
 
-    res = response.json()["message"]["content"]
+    res = response.message.content
     message_id = _salvar_troca(chat_id, content, res)
 
     return {
@@ -100,31 +97,21 @@ def send_to_llm(content: str, chat_id: int):
 
 def send_to_llm_stream(content: str, chat_id: int):
     (prompt, _) = generate_default_prompt(content, chat_id)
-    # print("Prompt enviado à LLM: %s", prompt)
 
-    with _session.post(
-        OLLAMA_URL,
-        json=_montar_payload(prompt, stream=True),
+    stream = _client.chat(
+        model=MODEL,
+        messages=prompt,
+        options=_OPTIONS,
         stream=True,
-        timeout=TIMEOUT
-    ) as response:
-        response.raise_for_status()
+    )
 
-        for line in response.iter_lines():
-            if not line:
-                continue
+    for chunk in stream:
+        token = chunk.message.content
+        if token:
+            yield token
 
-            data = json.loads(line)
-
-            if "error" in data:
-                raise RuntimeError(data["error"])
-
-            token = data.get("message", {}).get("content", "")
-            if token:
-                yield token
-
-            if data.get("done"):
-                break
+        if chunk.done:
+            break
 
 
 def stream_and_save(content: str, chat_id: int):
