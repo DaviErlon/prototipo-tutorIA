@@ -24,7 +24,6 @@ _OPTIONS = {
     "num_predict": MAX_TOKENS,
 }
 
-
 def _buscar_chunks(content: str) -> list[dict]:
     if not content:
         return []

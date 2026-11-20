@@ -23,9 +23,9 @@ def _montar_database_url() -> str:
     user = quote_plus(_obrigatoria("POSTGRES_USER"))
     senha = quote_plus(_obrigatoria("POSTGRES_PASSWORD"))
     banco = _obrigatoria("POSTGRES_DB")
-    socket = _obrigatoria("POSTGRES_SOCKET")
+    host = _obrigatoria("POSTGRES_HOST")
 
-    return f"postgresql://{user}:{senha}@{socket}/{banco}"
+    return f"postgresql://{user}:{senha}@{host}:5432/{banco}"
 
 
 # ENVs obrigatorias
